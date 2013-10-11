@@ -97,8 +97,14 @@ Param        | Vimeo | YouTube | DailyMotion
 *Soon to be supported:*
 
 * Spotify
-* Facebook
 * SoundCloud
+* MixCloud
+* Grooveshark
+* Last.fm
 * Ustream
+* Vevo
+* Twitch.tv
+* Justin.tv
+* Vine
 * *Yours!*
 
