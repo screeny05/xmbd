@@ -6,6 +6,8 @@ xmbd provides different events and methods for different provider under one simp
 
 It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a video on your page.
 
+*Sidenote:* Be sure to include [swfobject](https://code.google.com/p/swfobject/) to enable embedding of flash-objects.
+
 
 ## How-To:
 1. Create a xmbd-object
@@ -67,17 +69,36 @@ It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a v
 * `stop`: Stops the Video/Whatever. **Warning:** May not work on every object. Falls back to a simple pause if needed.
 * `cue`: Cues to a given second somewhere in the objects timeline. See above for a usage sample (needs a second param=time)
 
-### Supported Media-Provider:
+## Available Embed-Options:
+*Sidenote:* Some of these are not available on every provider so this is a list with those everyone has.
+
+Param        | Vimeo | YouTube | DailyMotion
+-------------|:-----:|:-------:|:----------:
+`autoplay`   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+`loop`       | :heavy_check_mark: | :heavy_check_mark: |
+`autohide`   | :heavy_check_mark: | :heavy_check_mark:
+`theme`      || :heavy_check_mark:
+`color`      | :heavy_check_mark:
+`highlight`  ||| :heavy_check_mark:
+`foreground` ||| :heavy_check_mark:
+`background` ||| :heavy_check_mark:
+
+1. Use colors for `foreground` or `color` like `00adef` (Hex but without the #)
+2. Autohide under Vimeo just hides [byline and portrait](http://developer.vimeo.com/player/embedding#universal-parameters)
+3. Autohide under YouTube uses autohide=[2](https://developers.google.com/youtube/player_parameters#autohide) *not 1* (Refer to the manual for differences)
+4. Available YouTube-Themes: `dark` and `light`
+
+## Available Media-Provider:
 
 * Vimeo
 * YouTube
 * DailyMotion
 
-
-### Soon to be supported:
+*Soon to be supported:*
 
 * Spotify
 * Facebook
 * SoundCloud
-* _Yours!?_
+* Ustream
+* *Yours!*
 
