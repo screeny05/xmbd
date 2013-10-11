@@ -1,8 +1,13 @@
-/*
-<iframe src="player.vimeo.com/video/75320274"   width="500" height="281" frameborder="0"></iframe>
-<iframe src="www.youtube.com/embed/n_-ayw8sLOA" width="560" height="315" frameborder="0"></iframe>
-<iframe src="www.dailymotion.com/embed/video/x1571bg" width="480" height="270" frameborder="0"></iframe>
-*/
+var vids = {
+	youtube: "n_-ayw8sLOA",
+	vimeo: "75320274",
+	dailymotion: "x1571bg"
+};
+var opts = {
+	autoplay: true,
+	autohide: true,
+	theme: "light"
+};
 
 var x;
 $(function(){
@@ -12,15 +17,16 @@ $(function(){
 		console.log(e);
 	});
 
-	x.embed("dailymotion", "x1571bg", {
-		autoplay: true,
-		autohide: true,
-		theme: "light"
-	});
+	x.embed("dailymotion", "x1571bg", opts);
 	
 	$(".cmd").click(function(e){
 		e.preventDefault();
 		x.action($(this).text().toLowerCase());
+	});
+	$(".mbd").click(function(e){
+		e.preventDefault();
+		var p = $(this).text().toLowerCase();
+		x.embed(p, vids[p], opts);
 	});
 	$("#cue").click(function(e){
 		e.preventDefault();
