@@ -1,4 +1,5 @@
-# xmbd.
+# ![xmbd.](http://i.imgur.com/BWwq2iO.png "xmbd.")
+
 
 xmbd is a jQuery-plugin which gives you the ability to embed media from several provider on your website.
 
