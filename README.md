@@ -52,6 +52,9 @@ It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a v
    ```
 5. Do Whatever you want!
 
+## Example
+You can find an Example which implements a small playlist [here on jsFiddle](http://jsfiddle.net/KtUH6/1/).
+
 ## Available Events:
 * `vUnstarted`: No Video loaded
 * `vEnded`: Video Finished Playing (like ending, huh?!)
@@ -108,4 +111,5 @@ Param        | Vimeo | YouTube | DailyMotion
 * Justin.tv
 * Vine
 * *Yours!*
+
 
