@@ -12,7 +12,7 @@
 			id: ""
 		};
 		// Generate a GUID to use as the players id
-		$plg.guid = $plg.guid="xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(/[xy]/g,function(b){var a=16*Math.random()|0;return("x"==b?a:a&3|8).toString(16)});
+		$plg.guid = $plg.guid="xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(/[xy]/g,function(b){var a=16*Math.random()|0;return("x"==b?a:a&3|8).toString(16);});
 		
 		/*
 		*	Small Library for triggering Events
@@ -52,7 +52,7 @@
 				getUrl: function(id, options){
 					options = options || {};
 					var params = [
-						"?autoplay="	+ +(options.autoplay || false),
+						"?autoplay="	+ (+(options.autoplay || false)),
 						"autohide="		+ (options.autohide || false ? "1" : "2"),
 						"loop="			+ (options.loop || false ? "1&playlist=" + id : "0"),
 						"theme="		+ (options.theme || "dark"),
@@ -95,11 +95,11 @@
 				},
 				getUrl: function(id, options){
 					var params = [
-						"?autoplay="	+ +(options.autoplay || false),
-						"byline="		+ +(options.autohide || false),
-						"portrait="		+ +(options.autohide || false),
+						"?autoplay="	+ (+(options.autoplay || false)),
+						"byline="		+ (+(options.autohide || false)),
+						"portrait="		+ (+(options.autohide || false)),
 						"color="		+ (options.color || "00adef"),
-						"loop="			+ +(options.loop || false),
+						"loop="			+ (+(options.loop || false)),
 						"player_id="	+ $plg.guid,
 						"api=1"
 					].join("&");
@@ -156,13 +156,13 @@
 				getUrl: function(id, options){
 					var params = [
 						"?autoPlay="	+ (options.autoplay || false),
-						(options.highlight == false ? "" : "highlight="	+ options.highlight),
-						(options.foreground == false ? "" : "foreground="	+ options.foreground),
-						(options.background == false ? "" : "background="	+ options.background),
+						(options.highlight === false ? "" : "highlight="	+ options.highlight),
+						(options.foreground === false ? "" : "foreground="	+ options.foreground),
+						(options.background === false ? "" : "background="	+ options.background),
 						"playerapiid="	+ $plg.guid,
 						"enableApi=1"
 					].join("&");
-					return "//www.dailymotion.com/swf/" + id + params
+					return "//www.dailymotion.com/swf/" + id + params;
 				},
 				play: function(){
 					$plg.player.playVideo();
@@ -251,13 +251,17 @@
 		
 		$plg.embedSWF = function(url){
 			$plg.html("<div id='" + $plg.guid + "'></div>");
-
-			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
-				if(!e.success){
-					$plg.trigger("error", "Unable to embed SWF");
-					throw new Error("Unable to embed SWF");
-				}
-			});
+      if(typeof window.swfobject != "undefined" && window.swfobject && window.swfobject.embedSwf){
+				window.swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
+					if(!e.success){
+						$plg.trigger("error", "Unable to embed SWF");
+						throw new Error("Unable to embed SWF");
+					}
+				});
+      } else {
+        $plg.trigger("error", "Make sure you have included swfobject");
+        throw new Error("Make sure you have included swfobject"); 
+      }
 		};
 		
 		$plg.action = function(s){
@@ -301,7 +305,7 @@
 		};
 		
 		return $plg;
-	}
+	};
 }(jQuery));
 
 // Youtube-Compatible-Provider
@@ -310,17 +314,17 @@ window.ytCompatibleReady = function(e){
 	player.addEventListener("onStateChange", "onytcstatechange_" + e);
 	player.addEventListener("onError", "onytcstatechange_" + e);
 	window["onytcstatechange_" + e](9);
-}
+};
 
 //Vimeo specific
 window.onVimeoMessage = function(m){
 	var data = JSON.parse(m.data);
 	window["onvimeostatechange_" + data.player_id](data.event);
-}
+};
 if(window.addEventListener)
-	window.addEventListener('message', onVimeoMessage, false);
+	window.addEventListener('message', window.onVimeoMessage, false);
 else
-	window.attachEvent('onmessage', onVimeoMessage, false);
+	window.attachEvent('onmessage', window.onVimeoMessage, false);
 
 //Dailymotion specific
 window.onDailymotionPlayerReady = window.ytCompatibleReady;
