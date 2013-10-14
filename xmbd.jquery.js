@@ -55,7 +55,7 @@
 						"autohide="		+ (options.autohide || false ? "1" : "2"),
 						"loop="			+ (options.loop || false ? "1&playlist=" + id : "0"),
 						"theme="		+ (options.theme || "dark"),
-						"origin="		+ encodeURIComponent(window.location.host),
+						"origin="		+ encodeURIComponent(window.location.protocol + "//" + window.location.host),
 						"playerapiid="	+ $plg.guid,
 						"enablejsapi=1",
 						"version=3",
@@ -185,6 +185,23 @@
 		};
 		
 		$plg.embed = function(prov, id, options){
+			if(typeof prov == "object" && typeof id == "undefined" && typeof options == "undefined"){
+				if(prov.hasOwnProperty("options"))
+					options = prov.options;
+				if(prov.hasOwnProperty("on"))
+					options.on = prov.on;
+				id = prov.id;
+				prov = prov.provider;
+			}
+			options = options || {};
+			if(options.hasOwnProperty("on")){
+				for(var key in options.on){
+					if(options.on.hasOwnProperty(key)){
+						$plg.on(key, options.on[key]);
+					}
+				}
+			}
+			
 			var embedObj = $plg.getProviderUrl(prov, id, options);
 			$plg.current.provider = prov;
 			$plg.current.id = id;
@@ -208,7 +225,7 @@
 		$plg.embedSWF = function(url){
 			$plg.html("<div id='" + $plg.guid + "'></div>");
 
-			swfobject.embedSWF(url, $plg.guid, "100%", "380", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
+			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
 				if(!e.success){
 					throw new Error("Unable to embed SWF");
 					$plg.trigger("error", "Unable to embed SWF");
