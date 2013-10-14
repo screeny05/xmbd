@@ -187,6 +187,21 @@
 				iframe: $plg.provider[prov].iframe
 			};
 		};
+		$plg.getVideoId = function(url){			
+			for(var provider in $plg.provider){
+				if($plg.provider.hasOwnProperty(provider)){
+					var regex = $plg.provider[provider].regex(url);
+					if(regex){
+						return {
+							provider: provider,
+							id: regex
+						};
+					}
+				}
+			}
+			
+			return false;
+		};
 		
 		$plg.embed = function(prov, id, options){
 			if(typeof prov == "object" && typeof id == "undefined" && typeof options == "undefined"){
