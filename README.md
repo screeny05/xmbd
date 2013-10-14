@@ -52,8 +52,98 @@ It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a v
    ```
 5. Do Whatever you want!
 
+## 
+
 ## Example
 You can find an Example which implements a small playlist [here on jsFiddle](http://jsfiddle.net/KtUH6/1/).
+
+## Available Methods (Public jQuery Methods)
+* `embed`: can be invoked the way you like it!
+   
+   For options see [Available Embed Options](#available-embed-options) below.
+
+   #### With three parameters (3rd one optional)
+   ```javascript
+   x.embed(provider, id, options);
+
+   // example:
+   x.embed('youtube', 'xxxxxxxxxx', {
+     autoplay: true,
+     autohide: true,
+     theme: 'light'
+   });
+   ```
+
+   #### With one parameter (object-style):
+   ```javascript
+   x.embed(mediaObject);
+
+   // example:
+   x.embed({
+     provider: 'youtube',
+     id: 'xxxxxxxxx',
+     autoplay: true,
+     autohide: true
+   });
+   ```
+   
+   #### Note: You can also place event-handler inside the options:
+   *They won't be removed when you're embeding another media-item. so take care!*
+   
+   ```javascript
+   x.embed('youtube', 'xxxxxxxxxx', {
+     autoplay: true,
+     on: {
+       vEnded: function(){
+         alert("Media Item ended");
+       }
+     }
+   });
+   ```
+   
+   *or Object-Style:*
+   ```javascript
+   x.embed({
+     provider: 'youtube',
+     id: 'xxxxxxxxxx',
+     autoplay: true,
+     on: {
+       vEnded: function(){
+         alert("Media Item ended");
+       }
+     }
+   });
+   ```
+   
+   **Returns:** Nothing  
+   **Summary:** Replaces the jQuery-selected-dom-element with an embedded media-object.
+   
+   
+* `getMediaUrl`: call it like `x.getMediaUrl(provider:string, id:string, options:object);`  
+   **Returns:** a fully-featured and embed-ready id-object:
+
+   ```javascript
+   {
+     url: '//youtube.com/v/xxxxxxxxxx?autoplay=1',
+     iframe: false
+   }
+   ```
+   The `iframe` tells you whether you have to embed the url as iframe or as swfobject.  
+   **Summary:** have a look at the 3-parameter-style invokation of the embed method.
+   
+   
+* `getMediaId`: call it like `x.getMediaId(url:string)`  
+   **Returns:** the media-id and provider of the given url as object:
+
+   ```javascript
+   {
+     provider: 'youtube',
+     id: 'xxxxxxxxx'
+   }
+   ```
+
+
+* `action`: Executes an Action on the Player (see [the list below](#available-actions-for-use-with-xaction) for available Actions)
 
 ## Available Events:
 * `vUnstarted`: No Video loaded
@@ -63,10 +153,10 @@ You can find an Example which implements a small playlist [here on jsFiddle](htt
 * `vBuffering`: As it names says. The Video is buffering
 * `vCued`: The Video has been cued. like seeked but in another word.
 * `playerReady`: The Player is ready for some action!
-* `playerChange`: There has been a stateChange. This event is like all *v-prefixed-events* but you don't have to subscribe to each just to get changes. **Warning:** This is probalby not the final event-name. i might change it to something like.. `playerStateChange` or `hollyMollyawesomeness`
+* `playerStateChange`: There has been a stateChange. This event is like all *v-prefixed-events* but you don't have to subscribe to each just to get changes.
 * `error`: Our Plain old error event
 
-## Available Methods:
+## Available Actions (for use with `x.action("*")`)
 * `play`: Plays the item (who would've known?)
 * `pause`: Eyup, this pauses the item
 * `toggle`: like play and pause combined but more convenient
@@ -74,7 +164,8 @@ You can find an Example which implements a small playlist [here on jsFiddle](htt
 * `cue`: Cues to a given second somewhere in the objects timeline. See above for a usage sample (needs a second param=time)
 
 ## Available Embed-Options:
-*Sidenote:* Some of these are not available on every provider so this is a list with those everyone has.
+This is a list of available options for embedding a media-object.  
+See the footnotes for further details.
 
 Param        | Vimeo | YouTube | DailyMotion
 -------------|:-----:|:-------:|:----------:
