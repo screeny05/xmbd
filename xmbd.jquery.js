@@ -11,6 +11,17 @@
 			provider: "",
 			id: ""
 		};
+		
+		$plg.availableStates = {
+			"-1": "vUnstarted",
+			0: "vEnded",
+			1: "vPlaying",
+			2: "vPaused",
+			3: "vBuffering",
+			5: "vCued",
+			9: "playerReady",
+		};
+		
 		// Generate a GUID to use as the players id
 		$plg.guid = $plg.guid="xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(/[xy]/g,function(b){var a=16*Math.random()|0;return("x"==b?a:a&3|8).toString(16);});
 		
@@ -65,6 +76,13 @@
 				
 					return "//www.youtube.com/v/" + id + params;
 				},
+				state: function(s){
+					if($plg.availableStates.hasOwnProperty(s)){
+						return $plg.availableStates[s];
+					} else {
+						return s;
+					}
+				},
 				play: function(){
 					$plg.player.playVideo();
 				},
@@ -76,12 +94,6 @@
 				},
 				cue: function(time){
 					$plg.player.seekTo(time, true);
-				},
-				toggle: function(){
-					if($plg.current.state == 1)
-						$plg.action("pause");
-					else
-						$plg.action("play");
 				}
 			},
 			vimeo: {
@@ -106,13 +118,14 @@
 					return "//player.vimeo.com/video/" + id + params;
 				},
 				state: function(s){
+					var st = $plg.availableStates;
 					switch(s){
-						case "finish":			return 0;
-						case "play":			return 1;
-						case "pause":			return 2;
-						case "loadProgress":	return 3;
-						case "seek":			return 5;
-						case "ready":			return 9;
+						case "finish":			return st[0];
+						case "play":			return st[1];
+						case "pause":			return st[2];
+						case "loadProgress":	return st[3];
+						case "seek":			return st[5];
+						case "ready":			return st[9];
 						default:				return s;
 					}
 				},
@@ -133,12 +146,6 @@
 				},
 				cue: function(time){
 					$plg.provider.vimeo.post("seekTo", time);
-				},
-				toggle: function(){
-					if($plg.current.state == 1)
-						$plg.action("pause");
-					else
-						$plg.action("play");
 				}
 			},
 			dailymotion: {
@@ -175,12 +182,6 @@
 				},
 				cue: function(time){
 					$plg.player.seekTo(time);
-				},
-				toggle: function(){
-					if($plg.current.state == 1)
-						$plg.action("pause");
-					else
-						$plg.action("play");
 				}
 			}
 		};
@@ -237,7 +238,7 @@
 				$("#" + $plg.guid).remove();
 			
 			if($plg.player)
-				$plg.trigger("vUnstarted");
+				$plg.triggerStateChange($plg.availableStates["-1"]);
 			
 			if(!embedObj.iframe)
 				$plg.embedSWF(embedObj.url);
@@ -251,52 +252,39 @@
 		
 		$plg.embedSWF = function(url){
 			$plg.html("<div id='" + $plg.guid + "'></div>");
-      if(typeof window.swfobject != "undefined" && window.swfobject && window.swfobject.embedSwf){
-				window.swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
-					if(!e.success){
-						$plg.trigger("error", "Unable to embed SWF");
-						throw new Error("Unable to embed SWF");
-					}
-				});
-      } else {
-        $plg.trigger("error", "Make sure you have included swfobject");
-        throw new Error("Make sure you have included swfobject"); 
-      }
+			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
+				if(!e.success){
+					$plg.trigger("error", "Unable to embed SWF");
+					throw new Error("Unable to embed SWF");
+				}
+			});
 		};
 		
 		$plg.action = function(s){
-			if($plg.provider[$plg.current.provider].hasOwnProperty(s))
+			if($plg.provider[$plg.current.provider].hasOwnProperty(s)){
 				return $plg.provider[$plg.current.provider][s].apply(this, Array.prototype.slice.call(arguments, 1));
-			throw new Error("No such method: " + s);
+			} else if(s === "toggle"){
+				if($plg.current.state !== "vPlaying"){
+					$plg.action("play");
+				} else {
+					$plg.action("pause");
+				}
+			} else {
+				throw new Error("No such method: " + s);
+			}
 		};
 		
 		$plg.triggerStateChange = function(s){
-			var t = $plg.trigger;
-			var states = {
-				-1: "vUnstarted",
-				0: "vEnded",
-				1: "vPlaying",
-				2: "vPaused",
-				3: "vBuffering",
-				5: "vCued",
-				9: "playerReady",
-			};
-			
-			if(states.hasOwnProperty(s)){
-				t(states[s]);
-				t("playerStateChange", states[s]);
-				$plg.current.state = states[s];
-			} else {
-				t("error");
-				t("playerStateChange", "error");
-				$plg.current.state = "error";
-			}
+			$plg.trigger(s);
+			$plg.trigger("playerStateChange", s);
+			$plg.current.state = s;
 		};
 		
 		// Youtube-Compatible
 		window["onytcstatechange_" + $plg.guid] = function(s){
+			s = $plg.provider.youtube.state(s);
 			$plg.triggerStateChange(s);
-			if(s == 9){
+			if(s == "playerReady"){
 				$plg.player = document.getElementById($plg.guid);
 			}
 		};
@@ -304,7 +292,7 @@
 		window["onvimeostatechange_" + $plg.guid] = function(s){
 			s = $plg.provider.vimeo.state(s);
 			$plg.triggerStateChange(s);
-			if(s == 9){
+			if(s == "playerReady"){
 				$(["pause", "finish", "play"]).each(function(i, e){
 					$plg.provider.vimeo.post("addEventListener", e);
 				});
