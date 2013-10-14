@@ -272,17 +272,24 @@
 		
 		$plg.triggerStateChange = function(s){
 			var t = $plg.trigger;
-			t("playerStateChange", s);
-			$plg.current.state = s;
-			switch(s){
-				case -1: t("vUnstarted"); break;
-				case 0 : t("vEnded"); break;
-				case 1 : t("vPlaying"); break;
-				case 2 : t("vPaused"); break;
-				case 3 : t("vBuffering"); break;
-				case 5 : t("vCued"); break;
-				case 9 : t("playerReady"); break;
-				default: t("error", s);
+			var states = {
+				-1: "vUnstarted",
+				0: "vEnded",
+				1: "vPlaying",
+				2: "vPaused",
+				3: "vBuffering",
+				5: "vCued",
+				9: "playerReady",
+			};
+			
+			if(states.hasOwnProperty(s)){
+				t(states[s]);
+				t("playerStateChange", states[s]);
+				$plg.current.state = states[s];
+			} else {
+				t("error");
+				t("playerStateChange", "error");
+				$plg.current.state = "error";
 			}
 		};
 		
