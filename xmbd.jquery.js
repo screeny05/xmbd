@@ -143,7 +143,14 @@
 			dailymotion: {
 				iframe: false,
 				regex: function(url){
-					//Todo
+					var m = url.match(/dailymotion.com\/(?:(?:video|hub)\/([^_]+))?[^#]*(?:#video=([^_&]+))?/i);
+					if(!m)
+						return false;
+					else
+						if(m[2])
+							return m[2];
+						else
+							return m[1];
 				},
 				url: function(id, options){
 					var params = [
