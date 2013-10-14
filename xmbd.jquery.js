@@ -33,22 +33,23 @@
 		/*
 		*	Media Provider Library
 		*	Providers need:
-		*	- regex(url) [turns a full url into the video-id]
-		*	- url(id, options) [turns a video-id with given options into a embeddable url]
+		*	- iframe<bool> true = url is an iframe, not a swf
+		*	- getId(url) [turns a full url into the video-id]
+		*	- getUrl(id, options) [turns a video-id with given options into a embeddable url]
 		*	- state(s) [turns the state from the player into a yt-api-compatible state-number]
 		*	- play, pause, toggle, stop, cue [should explain themselves]
 		*/
 		$plg.provider = {
 			youtube: {
 				iframe: false,
-				regex: function(url){
+				getId: function(url){
 					var m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
 					if(!m)
 						return false;
 					else
 						return m[1];
 				},
-				url: function(id, options){
+				getUrl: function(id, options){
 					options = options || {};
 					var params = [
 						"?autoplay="	+ +(options.autoplay || false),
@@ -85,14 +86,14 @@
 			},
 			vimeo: {
 				iframe: true,
-				regex: function(url){
+				getId: function(url){
 					var m = url.match(/(?:player\.)?vimeo\.com\/(?:\w+\/)*(\d+)/i);
 					if(!m)
 						return false;
 					else
 						return m[1];
 				},
-				url: function(id, options){
+				getUrl: function(id, options){
 					var params = [
 						"?autoplay="	+ +(options.autoplay || false),
 						"byline="		+ +(options.autohide || false),
@@ -142,7 +143,7 @@
 			},
 			dailymotion: {
 				iframe: false,
-				regex: function(url){
+				getId: function(url){
 					var m = url.match(/dailymotion.com\/(?:(?:video|hub)\/([^_]+))?[^#]*(?:#video=([^_&]+))?/i);
 					if(!m)
 						return false;
@@ -152,7 +153,7 @@
 						else
 							return m[1];
 				},
-				url: function(id, options){
+				getUrl: function(id, options){
 					var params = [
 						"?autoPlay="	+ (options.autoplay || false),
 						(options.highlight == false ? "" : "highlight="	+ options.highlight),
@@ -184,20 +185,20 @@
 			}
 		};
 		
-		$plg.getProviderUrl = function(prov, id, options){
+		$plg.getMediaUrl = function(prov, id, options){
 			if(!$plg.provider.hasOwnProperty(prov)){
 				throw new Error("Provider not supported");
 				$plg.trigger("error", "Provider not supported");
 			}
 			return {
-				url: $plg.provider[prov].url(id, options),
+				url: $plg.provider[prov].getUrl(id, options),
 				iframe: $plg.provider[prov].iframe
 			};
 		};
-		$plg.getVideoId = function(url){			
+		$plg.getMediaId = function(url){
 			for(var provider in $plg.provider){
 				if($plg.provider.hasOwnProperty(provider)){
-					var regex = $plg.provider[provider].regex(url);
+					var regex = $plg.provider[provider].getId(url);
 					if(regex){
 						return {
 							provider: provider,
@@ -228,7 +229,7 @@
 				}
 			}
 			
-			var embedObj = $plg.getProviderUrl(prov, id, options);
+			var embedObj = $plg.getMediaUrl(prov, id, options);
 			$plg.current.provider = prov;
 			$plg.current.id = id;
 			
@@ -267,7 +268,7 @@
 		
 		$plg.triggerStateChange = function(s){
 			var t = $plg.trigger;
-			t("playerChange", s);
+			t("playerStateChange", s);
 			$plg.current.state = s;
 			switch(s){
 				case -1: t("vUnstarted"); break;
