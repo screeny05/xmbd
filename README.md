@@ -145,6 +145,19 @@ You can find an Example which implements a small playlist [here on jsFiddle](htt
 
 * `action`: Executes an Action on the Player (see [the list below](#available-actions-for-use-with-xaction) for available Actions)
 
+## Available Objects:
+You can access the current state of the player through `x.current`.
+
+It contains three different properties:
+
+```javascript
+current = {
+  state: 'vPlaying', // see Available Events for info to the states
+  provider: 'youtube',
+  id: 'xxxxxxxxx'
+}
+```
+
 ## Available Events:
 * `vUnstarted`: No Video loaded
 * `vEnded`: Video Finished Playing (like ending, huh?!)
