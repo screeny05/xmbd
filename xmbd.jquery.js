@@ -42,7 +42,7 @@
 			youtube: {
 				iframe: false,
 				regex: function(url){
-					var m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/);
+					var m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
 					if(!m)
 						return false;
 					else
@@ -86,7 +86,11 @@
 			vimeo: {
 				iframe: true,
 				regex: function(url){
-					//Todo
+					var m = url.match(/(?:player\.)?vimeo\.com\/(?:\w+\/)*(\d+)/i);
+					if(!m)
+						return false;
+					else
+						return m[1];
 				},
 				url: function(id, options){
 					var params = [
