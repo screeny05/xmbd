@@ -187,8 +187,8 @@
 		
 		$plg.getMediaUrl = function(prov, id, options){
 			if(!$plg.provider.hasOwnProperty(prov)){
-				throw new Error("Provider not supported");
 				$plg.trigger("error", "Provider not supported");
+				throw new Error("Provider not supported");
 			}
 			return {
 				url: $plg.provider[prov].getUrl(id, options),
@@ -254,8 +254,8 @@
 
 			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
 				if(!e.success){
-					throw new Error("Unable to embed SWF");
 					$plg.trigger("error", "Unable to embed SWF");
+					throw new Error("Unable to embed SWF");
 				}
 			});
 		};
