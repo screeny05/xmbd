@@ -85,7 +85,7 @@
 						"autohide="		+ (options.autohide || false ? "1" : "2"),
 						"loop="			+ (options.loop || false ? "1&playlist=" + id : "0"),
 						"theme="		+ (options.theme || "dark"),
-						"origin="		+ encodeURIComponent(window.location.protocol + "//" + window.location.host),
+						"origin="		+ encodeURIComponent(window.location.origin),
 						"playerapiid="	+ $plg.guid,
 						"enablejsapi=1",
 						"version=3",
@@ -402,6 +402,18 @@ else
 //Dailymotion specific
 window.onDailymotionPlayerReady = window.ytCompatibleReady;
 window.onYouTubePlayerReady = window.ytCompatibleReady;
+
+// Use window.location.origin for youtube
+// This is just a fix for Browsers which do
+// not support this property. damn IE.
+// See: http://tosbourn.com/2013/08/javascript/a-fix-for-window-location-origin-in-internet-explorer/
+if (!window.location.origin) {
+  window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+}
+
+
+
+
 
 
 
