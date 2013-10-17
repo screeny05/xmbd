@@ -1,3 +1,4 @@
+if (!window.location.origin) { window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');}
 var vids = {
 	youtube: "n_-ayw8sLOA",
 	vimeo: "75320274",
@@ -16,7 +17,7 @@ asyncTest("Event-Lib", function(){
 		ok(true, "Event triggering working");
 		equal(val, "value", "Params working");
 	});
-	x.embed("youtube", vids.youtube, {
+	x.embed("vimeo", vids.vimeo, {
 		on: {
 			custom2: function(){
 				ok(true, "Event binding through embed-method");
@@ -44,10 +45,10 @@ test("YouTube", function(){
 		theme: "light"
 	});
 	
-	var ap_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=http%3A%2F%2Flocalhost&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var ah_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=http%3A%2F%2Flocalhost&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var loop_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=http%3A%2F%2Flocalhost&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var theme_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=http%3A%2F%2Flocalhost&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var ap_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var ah_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var loop_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var theme_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
 	
 	equal(ap_url.url, ap_should, "Autoplay-Check");
 	equal(ah_url.url, ah_should, "Autohide-Check");
@@ -261,19 +262,20 @@ module("General");
 test("Embedding", function(){
 	var x = $("#qunit-fixture").xmbd();
 	
-	x.embed("youtube", vids.youtube);
-	ok(x.html().indexOf("object") !== -1, "Embedding SWFObjects");
+	/*x.embed("youtube", vids.youtube);
+	ok(x.html().indexOf("object") !== -1, "Embedding SWFObjects");*/
 	
 	x.embed("vimeo", vids.vimeo);
 	ok(x.html().indexOf("iframe") !== -1, "Embedding Iframes");
 });
 
 module("Callbacks & Actions (Vimeo)");
-asyncTest("PlayerReady", function(){
+/*asyncTest("PlayerReady", function(){
 	var x = $("#qunit-fixture").xmbd();
 	
 	x.embed("vimeo", vids.vimeo);
 	x.on("playerReady", function(s){
+		console.log(s);
 		ok(true, "Called!");
 		start();
 	});
@@ -369,7 +371,7 @@ asyncTest("action('toggle')", function(){
 			}
 		}
 	});
-});
+});*/
 
 
 

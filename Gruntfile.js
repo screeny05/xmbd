@@ -15,12 +15,28 @@ module.exports = function(grunt){
 			}
 		},
 		qunit: {
-			
+			all: {
+				options: {
+					timeout: 100000,
+					urls: [
+						'http://localhost:8000/test/qunit.html'
+					]
+				}
+			}
+		},
+		connect: {
+			server: {
+				options: {
+					port: 8000,
+					base: '.'
+				}
+			}
 		}
 	});
 	
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
+	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.registerTask('default', ['jshint', 'uglify']);
+	grunt.registerTask('default', ['jshint', 'uglify', 'connect', 'qunit']);
 };
