@@ -13,7 +13,7 @@ var x;
 $(function(){
 	x = $("#player").xmbd();
 	
-	x.on("playerChange", function(e){
+	x.on("playerStateChange", function(e){
 		console.log(e);
 	});
 

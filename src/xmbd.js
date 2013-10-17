@@ -44,6 +44,12 @@
 				events[e] = [];
 			events[e].push(fn);
 		};
+		$plg.unbind = function(e){
+			if(events.hasOwnProperty(e))
+				delete events[e];
+			else
+				throw new Error("Event " + e + "not bound");
+		};
 		$plg.trigger = function(e, d){
 			if(events.hasOwnProperty(e))
 				$(events[e]).each(function(i, e){
@@ -81,7 +87,7 @@
 					// be sure to have a options-object!
 					options = options || {};
 					var params = [
-						"?autoplay="	+ (+(options.autoplay || false)),
+						"autoplay="	+ (+(options.autoplay || false)),
 						"autohide="		+ (options.autohide || false ? "1" : "2"),
 						"loop="			+ (options.loop || false ? "1&playlist=" + id : "0"),
 						"theme="		+ (options.theme || "dark"),
@@ -91,11 +97,11 @@
 						"version=3",
 						"rel=0"
 					].join("&");
+					
 					// Yeah, I hear you saying:
 					// > string concatenation like this is not the fastest way, just use the +-operator!
 					// No, I won't. it's just more convenient imho. (more info: http://bit.ly/1cOocNZ)
-				
-					return "//www.youtube.com/v/" + id + params;
+					return "//www.youtube.com/v/" + id + "?" + params;
 				},
 				state: function(s){
 					// If the youtube-numbered-state is in the list of available states
@@ -123,7 +129,7 @@
 			vimeo: {
 				iframe: true,
 				getId: function(url){
-					var m = url.match(/(?:player\.)?vimeo\.com\/(?:\w+\/)*(\d+)/i);
+					var m = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/|video\/)?([0-9]+)/i);
 					if(!m)
 						return false;
 					else
@@ -135,9 +141,9 @@
 					options = options || {};
 					var params = [
 						"?autoplay="	+ (+(options.autoplay || false)),
-						"byline="		+ (+(options.autohide || false)),
-						"portrait="		+ (+(options.autohide || false)),
-						"color="		+ (options.color || "00adef"),
+						"byline="		+ (+!(options.autohide || false)),
+						"portrait="		+ (+!(options.autohide || false)),
+						"color="		+ (options.color || "00adef").replace("#", ""),
 						"loop="			+ (+(options.loop || false)),
 						"player_id="	+ $plg.guid,
 						"api=1"
@@ -191,7 +197,7 @@
 					// if m[2] is not null we use this instead of m[1]
 					// that's because the url may contain a video in the hashtag.
 					// if there's no video-id in the hashtag we can safely use m[1] (the original id)
-					var m = url.match(/dailymotion.com\/(?:(?:video|hub)\/([^_]+))?[^#]*(?:#video=([^_&]+))?/i);
+					var m = url.match(/dailymotion.com\/(?:(?:video|hub|swf)\/([^_]+))?[^#]*(?:#video=([^_&]+))?/i);
 					if(!m)
 						return false;
 					else
@@ -205,13 +211,13 @@
 					// see: http://www.dailymotion.com/doc/api/player.html#parameters
 					options = options || {};
 					var params = [
-						"?autoPlay="	+ (options.autoplay || false),
-						(options.highlight === false ? "" : "highlight="	+ options.highlight),
-						(options.foreground === false ? "" : "foreground="	+ options.foreground),
-						(options.background === false ? "" : "background="	+ options.background),
-						"playerapiid="	+ $plg.guid,
+						"?autoPlay="   + (+(options.autoplay || false)),
+						"highlight="   + (options.highlight  || "").replace("#", ""),
+						"foreground="  + (options.foreground || "").replace("#", ""),
+						"background="  + (options.background || "").replace("#", ""),
+						"playerapiid=" + $plg.guid,
 						"enableApi=1"
-					].join("&");
+					].join("&").replace("&highlight=&foreground=&background=", "");
 					return "//www.dailymotion.com/swf/" + id + params;
 				},
 				play: function(){
@@ -274,8 +280,10 @@
 			} else if(s === "toggle"){
 				if($plg.current.state !== "vPlaying"){
 					$plg.action("play");
+					return "play";
 				} else {
 					$plg.action("pause");
+					return "pause";
 				}
 			} else {
 				throw new Error("No such method: " + s);
@@ -294,6 +302,8 @@
 				id = options.id;
 				prov = options.provider;
 			}
+			
+			options = options || {};
 			
 			// Add all the event-handlers in the on-object.
 			if(options.hasOwnProperty("on")){
@@ -343,9 +353,9 @@
 		
 		// Updates the State and throws necessary Events.
 		$plg.triggerStateChange = function(s){
+			$plg.current.state = s;
 			$plg.trigger(s);
 			$plg.trigger("playerStateChange", s);
-			$plg.current.state = s;
 		};
 		
 		// Youtube-Compatible Media-Providers use this.
