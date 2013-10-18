@@ -27,18 +27,17 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-			<h1>Examples</h1>
 			<p>Here are some examples you may want to have a look at.</p>
 			<p>If you want to create your own example, just provide a pull-request.</p>
 			
-			<h2>Implementing a Playlist</h2>
-			<h3>HTML:</h3>
+			<h1>Implementing a Playlist</h1>
+			<h2>HTML:</h2>
 			<pre>
 &lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
 &lt;br/&gt;
 &lt;a id=&quot;next&quot; href=&quot;#&quot;&gt;Next&lt;/a&gt;
 			</pre>
-			<h3>JavaScript:</h3>
+			<h2>JavaScript:</h2>
 			<pre>
 var playlist = [
   {
@@ -73,12 +72,12 @@ player.on('vEnded', embedNext);
 $("#next").click(embedNext);
 embedNext();
 			</pre>
-			<h3><a href="#" class="toggle" data-target="#ex-1">Show Result</a></h3>
+			<h2><a href="#" class="toggle" data-target="#ex-1">Show Result</a></h2>
 			<iframe id="ex-1" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/KtUH6/3/embedded/result" frameborder="0"></iframe>
 			<hr>
 			
-			<h2>Player showcasing available actions</h2>
-			<h3>HTML:</h3>
+			<h1>Player showcasing available actions</h1>
+			<h2>HTML:</h2>
 			<pre>
 &lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
 &lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;pause&lt;/a&gt; |
@@ -92,7 +91,7 @@ embedNext();
 &lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;dailymotion&lt;/a&gt;
 
 			</pre>
-			<h3>JavaScript:</h3>
+			<h2>JavaScript:</h2>
 			<pre>
 var vids = {
 	youtube: "n_-ayw8sLOA",
@@ -130,12 +129,12 @@ $(function(){
 	});
 });
 			</pre>
-			<h3><a href="#" class="toggle" data-target="#ex-2">Show Result</a></h3>
+			<h2><a href="#" class="toggle" data-target="#ex-2">Show Result</a></h2>
 			<iframe id="ex-2" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/j5YEF/1/embedded/result" frameborder="0"></iframe>
 			<hr>
 			
-			<h2>Player showcasing available Events</h2>
-			<h3>HTML:</h3>
+			<h1>Player showcasing available Events</h1>
+			<h2>HTML:</h2>
 			<pre>
 &lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
 &lt;ul id=&quot;events&quot;&gt;&lt;/ul&gt;
@@ -148,7 +147,7 @@ $(function(){
 &lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;dailymotion&lt;/a&gt;
 
 			</pre>
-			<h3>JavaScript</h3>
+			<h2>JavaScript</h2>
 			<pre>
 var vids = {
 	youtube: "n_-ayw8sLOA",
@@ -182,7 +181,7 @@ $(".mbd").click(function(e){
 });
 
 			</pre>
-			<h3><a href="#" class="toggle" data-target="#ex-3">Show Result</a></h3>
+			<h2><a href="#" class="toggle" data-target="#ex-3">Show Result</a></h2>
 			<iframe id="ex-3" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/8FucD/3/embedded/result" frameborder="0"></iframe>
 			<hr>
         </section>
