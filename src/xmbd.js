@@ -2,7 +2,9 @@
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2013 Sebastian Langer
  * MIT-Licensed */
+
 ;(function($){
+	"use strict";
 	$.fn.xmbd = function(){
 		var $plg = this;
 		
@@ -40,21 +42,24 @@
 		*/
 		var events = {};
 		$plg.on = function(e, fn){
-			if(!events.hasOwnProperty(e))
+			if(!events.hasOwnProperty(e)){
 				events[e] = [];
+			}
 			events[e].push(fn);
 		};
 		$plg.unbind = function(e){
-			if(events.hasOwnProperty(e))
+			if(events.hasOwnProperty(e)){
 				delete events[e];
-			else
+			} else {
 				throw new Error("Event " + e + "not bound");
+			}
 		};
 		$plg.trigger = function(e, d){
-			if(events.hasOwnProperty(e))
+			if(events.hasOwnProperty(e)){
 				$(events[e]).each(function(i, e){
 					e(d);
 				});
+			}
 		};
 		
 		/*
@@ -73,10 +78,11 @@
 				getId: function(url){
 					// Found this RegEx somewhere on SO; Maybe i can give credit to the creator when i find it again.
 					var m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
-					if(!m)
+					if(!m){
 						return false;
-					else
+					} else {
 						return m[1];
+					}
 				},
 				getUrl: function(id, options){
 					// Note: (+(true)) turns to to a number-type. i.e: 1.
@@ -130,10 +136,11 @@
 				iframe: true,
 				getId: function(url){
 					var m = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/|video\/)?([0-9]+)/i);
-					if(!m)
+					if(!m){
 						return false;
-					else
+					} else {
 						return m[1];
+					}
 				},
 				getUrl: function(id, options){
 					// For a detailed explanation of the parameters
@@ -198,13 +205,15 @@
 					// that's because the url may contain a video in the hashtag.
 					// if there's no video-id in the hashtag we can safely use m[1] (the original id)
 					var m = url.match(/dailymotion.com\/(?:(?:video|hub|swf)\/([^_]+))?[^#]*(?:#video=([^_&]+))?/i);
-					if(!m)
+					if(!m){
 						return false;
-					else
-						if(m[2])
+					} else {
+						if(m[2]){
 							return m[2];
-						else
+						} else {
 							return m[1];
+						}
+					}
 				},
 				getUrl: function(id, options){
 					// For a detailed explanation of the params,
@@ -323,17 +332,18 @@
 			
 			// if there already is an embedded object, delete it
 			// so we don't have two instances.
-			if($("#" + $plg.guid).length > 0)
+			if($("#" + $plg.guid).length > 0){
 				$("#" + $plg.guid).remove();
-			
-			if($plg.player)
+			}
+			if($plg.player){
 				$plg.triggerStateChange($plg.availableStates["-1"]);
-			
+			}
 			// embed the object according to it's iframe-attribute
-			if(!embedObj.iframe)
+			if(!embedObj.iframe){
 				$plg.embedSWF(embedObj.url);
-			else
+			} else {
 				$plg.embedIframe(embedObj.url);
+			}
 		};
 		
 		$plg.embedIframe = function(url){
@@ -342,7 +352,12 @@
 		
 		$plg.embedSWF = function(url){
 			$plg.html("<div id='" + $plg.guid + "'></div>");
-			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, { allowScriptAccess: "always", allowFullScreen: "true" }, { id: $plg.guid }, function(e){
+			swfobject.embedSWF(url, $plg.guid, "100%", "100%", "8", null, null, {
+				allowScriptAccess: "always",
+				allowFullScreen: "true"
+			}, {
+				id: $plg.guid
+			}, function(e){
 				// throw an error if we had no success embedding the swfobject.
 				if(!e.success){
 					$plg.trigger("error", "Unable to embed SWF");
@@ -392,6 +407,7 @@
 
 // Youtube-Compatible-Provider
 window.ytCompatibleReady = function(e){
+	"use strict";
 	var player = document.getElementById(e);
 	player.addEventListener("onStateChange", "onytcstatechange_" + e);
 	player.addEventListener("onError", "onytcstatechange_" + e);
@@ -400,14 +416,17 @@ window.ytCompatibleReady = function(e){
 
 //Vimeo specific
 window.onVimeoMessage = function(m){
+	/* jshint camelcase: false */
+	"use strict";
 	var data = JSON.parse(m.data);
 	window["onvimeostatechange_" + data.player_id](data.event);
 };
 // see Vimeo API-Docs for more info about this.
-if(window.addEventListener)
-	window.addEventListener('message', window.onVimeoMessage, false);
-else
-	window.attachEvent('onmessage', window.onVimeoMessage, false);
+if(window.addEventListener){
+	window.addEventListener("message", window.onVimeoMessage, false);
+} else {
+	window.attachEvent("onmessage", window.onVimeoMessage, false);
+}
 
 //Dailymotion specific
 window.onDailymotionPlayerReady = window.ytCompatibleReady;
@@ -418,7 +437,7 @@ window.onYouTubePlayerReady = window.ytCompatibleReady;
 // not support this property. damn IE.
 // See: http://tosbourn.com/2013/08/javascript/a-fix-for-window-location-origin-in-internet-explorer/
 if (!window.location.origin) {
-  window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+	window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port: "");
 }
 
 
