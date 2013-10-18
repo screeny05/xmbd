@@ -165,7 +165,7 @@ var x = $("#player").xmbd();
 x.on("playerStateChange", function(e){
     var d = new Date();
     d = d.getHours() + ":" + d.getMinutes() + ":" + (d.getSeconds().toString().length == 1 ? "0" + d.getSeconds() : d.getSeconds()) + " ";
-    $("#events").prepend($("<li/>").text(d + e));
+    $("#events").prepend($("&lt;li/&gt;").text(d + e));
 });
 
 x.embed("dailymotion", "x1571bg", opts);
