@@ -2,7 +2,10 @@ module.exports = function(grunt){
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		jshint: {
-			all: ['Gruntfile.js', 'xmbd.jquery.js']
+			all: ['src/xmbd.js'],
+			options: {
+				jshintrc: '.jshintrc'
+			}
 		},
 		uglify: {
 			options: {
