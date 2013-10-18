@@ -1,6 +1,25 @@
 {
   "name": "xmbd",
   "version": "0.1.1",
+  "title": "jQuery xmbd",
+  "description": "Cross-provider media embedding with jQuery. Embeds YouTube, Vimeo and much more under a simple interface.",
+  "keywords": [
+    "jquery",
+    "media",
+    "embed",
+    "youtube",
+    "vimeo",
+    "dailymotione",
+    "library",
+    "abstraction"
+  ],
+  "homepage": "https://github.com/screeny05/xmbd",
+  "author": "Sebastian Langer <screeny05@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/screeny05/xmbd.git"
+  },
+  "bugs": "https://github.com/screeny05/xmbd/issues",
   "devDependencies": {
     "grunt": "*",
     "grunt-cli": "~0.1.9",
@@ -11,5 +30,6 @@
   },
   "scripts": {
     "test": "grunt --verbose"
-  }
+  },
+  "license": "MIT"
 }
