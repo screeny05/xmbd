@@ -1,0 +1,15 @@
+{
+  "undef": true,
+	"unused": true,
+	"jquery": true,
+	"browser": true,
+	"globals": {
+	    "swfobject": true
+	},
+    "camelcase": true,
+	"curly": true,
+	"quotmark": true,
+	"trailing": true,
+	"strict": true,
+	"forin": true
+}
