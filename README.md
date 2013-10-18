@@ -52,9 +52,7 @@ It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a v
    ```
 5. Do Whatever you want!
 
-## Examples
-- You can find an Example which implements a small playlist [here on jsFiddle](http://jsfiddle.net/KtUH6/3/).
-- Take a look at the examples-folder
+## [Examples can be found here](http://screeny05.github.io/xmbd/examples.html)
 
 ## Available Methods (Public jQuery Methods)
 * `embed`: can be invoked the way you like it!
