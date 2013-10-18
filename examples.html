@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter|Ubuntu+Mono:400' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>xmbd - Examples by screeny05</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <a href="./"><h1>xmbd - Examples</h1></a>
+        <h2>Cross-provider media embedding with jQuery</h2>
+        <a href="https://github.com/screeny05/xmbd" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+			<h1>Examples</h1>
+			<p>Here are some examples you may want to have a look at.</p>
+			<p>If you want to create your own example, just provide a pull-request.</p>
+			
+			<h2>Implementing a Playlist</h2>
+			<h3>HTML:</h3>
+			<pre>
+&lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
+&lt;br/&gt;
+&lt;a id=&quot;next&quot; href=&quot;#&quot;&gt;Next&lt;/a&gt;
+			</pre>
+			<h3>JavaScript:</h3>
+			<pre>
+var playlist = [
+  {
+    provider: 'youtube',
+    id: 'gwvXtfRjonc'
+  },
+  {
+    provider: 'vimeo',
+    id: '75423505'
+  },
+  {
+    provider: 'youtube',
+    id: 'sxpLiQgdTI0'
+  }
+];
+var opts = {
+  autoplay: true
+};
+
+var player = $('#player').xmbd();
+var index = 0;
+
+var embedNext = function(){
+    player.embed(playlist[index].provider, playlist[index].id, opts);
+    index += 1;
+    if(index === playlist.length){
+        index = 0;
+    }
+};
+
+player.on('vEnded', embedNext);
+$("#next").click(embedNext);
+embedNext();
+			</pre>
+			<h3><a href="#" class="toggle" data-target="#ex-1">Show Result</a></h3>
+			<iframe id="ex-1" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/KtUH6/3/embedded/result" frameborder="0"></iframe>
+			<hr>
+			
+			<h2>Player showcasing available actions</h2>
+			<h3>HTML:</h3>
+			<pre>
+&lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;pause&lt;/a&gt; |
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;play&lt;/a&gt; |
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;toggle&lt;/a&gt; |
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;stop&lt;/a&gt; |
+&lt;a id=&quot;cue&quot; href=&quot;#&quot;&gt;cue&lt;/a&gt;
+&lt;br&gt;
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;youtube&lt;/a&gt;,
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;vimeo&lt;/a&gt;,
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;dailymotion&lt;/a&gt;
+
+			</pre>
+			<h3>JavaScript:</h3>
+			<pre>
+var vids = {
+	youtube: "n_-ayw8sLOA",
+	vimeo: "75320274",
+	dailymotion: "x1571bg"
+};
+var opts = {
+	autoplay: true,
+	autohide: true,
+	theme: "light"
+};
+
+var x;
+$(function(){
+	x = $("#player").xmbd();
+	
+	x.on("playerStateChange", function(e){
+		console.log(e);
+	});
+
+	x.embed("dailymotion", "x1571bg", opts);
+	
+	$(".cmd").click(function(e){
+		e.preventDefault();
+		x.action($(this).text().toLowerCase());
+	});
+	$(".mbd").click(function(e){
+		e.preventDefault();
+		var p = $(this).text().toLowerCase();
+		x.embed(p, vids[p], opts);
+	});
+	$("#cue").click(function(e){
+		e.preventDefault();
+		x.action("cue", 20);
+	});
+});
+			</pre>
+			<h3><a href="#" class="toggle" data-target="#ex-2">Show Result</a></h3>
+			<iframe id="ex-2" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/j5YEF/1/embedded/result" frameborder="0"></iframe>
+			<hr>
+			
+			<h2>Player showcasing available Events</h2>
+			<h3>HTML:</h3>
+			<pre>
+&lt;div id=&quot;player&quot;&gt;&lt;/div&gt;
+&lt;ul id=&quot;events&quot;&gt;&lt;/ul&gt;
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;play&lt;/a&gt; |
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;pause&lt;/a&gt; |
+&lt;a class=&quot;cmd&quot; href=&quot;#&quot;&gt;stop&lt;/a&gt;
+&lt;br&gt;
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;youtube&lt;/a&gt;,
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;vimeo&lt;/a&gt;,
+&lt;a class=&quot;mbd&quot; href=&quot;#&quot;&gt;dailymotion&lt;/a&gt;
+
+			</pre>
+			<h3>JavaScript</h3>
+			<pre>
+var vids = {
+	youtube: "n_-ayw8sLOA",
+	vimeo: "75320274",
+	dailymotion: "x1571bg"
+};
+var opts = {
+	autoplay: true,
+	autohide: true,
+	theme: "light"
+};
+
+var x = $("#player").xmbd();
+
+x.on("playerStateChange", function(e){
+    var d = new Date();
+    d = d.getHours() + ":" + d.getMinutes() + ":" + (d.getSeconds().toString().length == 1 ? "0" + d.getSeconds() : d.getSeconds()) + " ";
+    $("#events").prepend($("<li/>").text(d + e));
+});
+
+x.embed("dailymotion", "x1571bg", opts);
+
+$(".cmd").click(function(e){
+	e.preventDefault();
+	x.action($(this).text().toLowerCase());
+});
+$(".mbd").click(function(e){
+	e.preventDefault();
+	var p = $(this).text().toLowerCase();
+	x.embed(p, vids[p], opts);
+});
+
+			</pre>
+			<h3><a href="#" class="toggle" data-target="#ex-3">Show Result</a></h3>
+			<iframe id="ex-3" width="100%" data-height="500px" height="0" data-src="http://jsfiddle.net/8FucD/3/embedded/result" frameborder="0"></iframe>
+			<hr>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/screeny05/xmbd/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/screeny05/xmbd/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/screeny05/xmbd"></a> is maintained by <a href="https://github.com/screeny05">screeny05</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+  $(function(){
+	$('.toggle').click(function(e){
+		e.preventDefault();
+		var iframe = $($(this).attr("data-target"));
+		
+		if($(this).attr("shown") === "true"){
+			iframe.attr("data-src", iframe.attr("src"));
+			iframe.attr("src", "");
+			
+			iframe.attr("data-height", iframe.attr("height"));
+			iframe.attr("height", "0");
+			
+			$(this).attr("shown", "false");
+			$(this).text("Show Result");
+		} else {
+			iframe.attr("src", iframe.attr("data-src"));
+			iframe.attr("height", iframe.attr("data-height"));
+			$(this).attr("shown", "true");
+			$(this).text("Hide Result");
+		}
+		
+	});
+  });
+  </script>
+  </body>
+</html>
