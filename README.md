@@ -1,4 +1,4 @@
-# ![xmbd.](http://i.imgur.com/BWwq2iO.png "xmbd.") [![Build Status](https://travis-ci.org/screeny05/xmbd.png?branch=master)](https://travis-ci.org/screeny05/xmbd)
+# ![xmbd.](http://i.imgur.com/BWwq2iO.png "xmbd.") [![Build Status](https://travis-ci.org/screeny05/xmbd.png?branch=master)](https://travis-ci.org/screeny05/xmbd) [![Dependency Status](https://gemnasium.com/screeny05/xmbd.png)](https://gemnasium.com/screeny05/xmbd)
 
 
 xmbd is a jQuery-plugin which gives you the ability to embed media from several provider on your website.
