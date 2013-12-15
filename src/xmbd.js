@@ -61,6 +61,9 @@
 				});
 			}
 		};
+		$plg.clearEvents = function(){
+			events = {};
+		}
 		
 		/*
 		*	Media Provider Library
@@ -76,6 +79,7 @@
 				// we use YouTube's ActionScript-API
 				iframe: false,
 				getId: function(url){
+					if(typeof url !== 'string')  return false;
 					// Found this RegEx somewhere on SO; Maybe i can give credit to the creator when i find it again.
 					var m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
 					if(!m){
@@ -108,6 +112,29 @@
 					// > string concatenation like this is not the fastest way, just use the +-operator!
 					// No, I won't. it's just more convenient imho. (more info: http://bit.ly/1cOocNZ)
 					return "//www.youtube.com/v/" + id + "?" + params;
+				},
+				getInfo: function(id, fn){
+					$.getJSON('//gdata.youtube.com/feeds/api/videos/' + id + '?alt=json-in-script&format=5&callback=?', function(data){
+						if(!data || !data.entry)  return fn(true);
+
+						var i = data.entry;
+
+						var r = {};
+						r.name = i.title.$t;
+						r.provider = 'youtube';
+						r.id = id;
+						r.duration = -1;
+						r.available = false;
+
+						$.each(i.media$group.media$content, function(i, item){
+							if(item.yt$format === 5){
+								r.duration = item.duration;
+								r.available = true;
+							}
+						});
+
+						return fn(null, r);
+					});
 				},
 				state: function(s){
 					// If the youtube-numbered-state is in the list of available states
@@ -156,6 +183,26 @@
 						"api=1"
 					].join("&");
 					return "//player.vimeo.com/video/" + id + params;
+				},
+				getInfo: function(id, fn){
+					$.ajax({
+						url: '//www.vimeo.com/api/v2/video/' + id + '.json?callback=?',
+						dataType: 'jsonp',
+						timeout: 3000,
+						success: function(data) {
+						  if(!data || !data[0])  return fn(true);
+						  fn(null, {
+						    name: data[0].title,
+						    provider: 'vimeo',
+						    id: id,
+						    duration: data[0].duration,
+						    available: data[0].embed_privacy == 'anywhere'
+						  });
+						},
+						error: function(){
+							return fn(true);
+						}
+					});
 				},
 				state: function(s){
 					var st = $plg.availableStates;
@@ -229,6 +276,18 @@
 					].join("&").replace("&highlight=&foreground=&background=", "");
 					return "//www.dailymotion.com/swf/" + id + params;
 				},
+				getInfo: function(id, fn){
+					$.getJSON('https://api.dailymotion.com/video/' + id + '?fields=title,duration,embed_url&callback=?', function(data) {
+					  if(!data || !data.embed_url)  return fn(true);
+					  fn(null, {
+					    name: data.title,
+					    provider: 'dailymotion',
+					    id: id,
+					    duration: data.duration,
+					    available: !!data.embed_url
+					  });
+					});
+				},
 				play: function(){
 					$plg.player.playVideo();
 				},
@@ -276,6 +335,14 @@
 			}
 			
 			return false;
+		};
+
+		$plg.getMediaInfo = function(prov, id, fn){
+			if(!$plg.provider.hasOwnProperty(prov)){
+				$plg.trigger("error", "Provider not supported");
+				return fn(true);
+			}
+			return $plg.provider[prov].getInfo(id, fn);
 		};
 		
 		// Abstracted Function (see $plg.getMediaUrl)
@@ -335,6 +402,7 @@
 			if($("#" + $plg.guid).length > 0){
 				$("#" + $plg.guid).remove();
 			}
+			// if there was already a player, send a vUnstarted event
 			if($plg.player){
 				$plg.triggerStateChange($plg.availableStates["-1"]);
 			}
@@ -347,7 +415,7 @@
 		};
 		
 		$plg.embedIframe = function(url){
-			$plg.append("<iframe src='" + url + "' id='" + $plg.guid + "' width='100%' height='100%' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>");
+			$plg.html("<iframe src='" + url + "' id='" + $plg.guid + "' width='100%' height='100%' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>");
 		};
 		
 		$plg.embedSWF = function(url){
@@ -376,15 +444,16 @@
 		// Youtube-Compatible Media-Providers use this.
 		// i.e: YouTube, DailyMotion
 		window["onytcstatechange_" + $plg.guid] = function(s){
+			// parse the state into a string.
 			s = $plg.provider.youtube.state(s);
-			$plg.triggerStateChange(s);
-			
 			// if this is the inital throw of this event
-			// change the $plg. player property, so we can
+			// change the $plg.player property, so we can
 			// execute player-specific methods like play & pause.
-			if(s == "playerReady"){
+			if(s === "playerReady"){
 				$plg.player = document.getElementById($plg.guid);
 			}
+
+			$plg.triggerStateChange(s);
 		};
 		// Vimeo stateChange-Handler
 		window["onvimeostatechange_" + $plg.guid] = function(s){
@@ -394,7 +463,10 @@
 			// if this is the inital throw of this event
 			// add eventListeners for all necessary events.
 			// TODO: are Errors also appended?
-			if(s == "playerReady"){
+			if(s === "playerReady"){
+				// set $plg.player to a truthy value
+				// to enable the vUnstarted-event on detachment
+				$plg.player = 'vimeo';
 				$(["pause", "finish", "play"]).each(function(i, e){
 					$plg.provider.vimeo.post("addEventListener", e);
 				});
