@@ -1,4 +1,4 @@
-/*! jQuery xmbd - v0.2.0 - 2013-12-15
+/*! jQuery xmbd - v0.1.2 - 2013-10-10
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2013 Sebastian Langer
  * MIT-Licensed */
