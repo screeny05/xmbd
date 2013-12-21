@@ -1,4 +1,4 @@
-/*! jQuery xmbd - v0.2.0 - 2013-12-15
+/*! jQuery xmbd - v0.2.1 - 2013-12-21
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2013 Sebastian Langer
  * MIT-Licensed */
@@ -114,7 +114,7 @@
 					return "//www.youtube.com/v/" + id + "?" + params;
 				},
 				getInfo: function(id, fn){
-					$.getJSON("//gdata.youtube.com/feeds/api/videos/" + id + "?alt=json-in-script&format=5&callback=?", function(data){
+					$.getJSON("//gdata.youtube.com/feeds/api/videos/" + id + "?alt=json-in-script&callback=?", function(data){
 						if(!data || !data.entry){
 							return fn(true);
 						}
@@ -128,12 +128,20 @@
 						r.duration = -1;
 						r.available = false;
 
+						// check if there is an embedable video
 						$.each(i.media$group.media$content, function(i, item){
 							if(item.yt$format === 5){
 								r.duration = item.duration;
 								r.available = true;
 							}
 						});
+
+						// yt:state docs:
+						// https://developers.google.com/youtube/2.0/reference?hl=de&csw=1#youtube_data_api_tag_yt:state
+						// "Video entries that contain a <yt:state> tag are not playable."
+						if(i.app$control && i.app$control.yt$state){
+							r.available = false;
+						}
 
 						return fn(null, r);
 					});
