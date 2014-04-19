@@ -45,10 +45,10 @@ test("YouTube", function(){
 		theme: "light"
 	});
 	
-	var ap_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var ah_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var loop_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var theme_should = "//www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var ap_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var ah_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var loop_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
+	var theme_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
 	
 	equal(ap_url.url, ap_should, "Autoplay-Check");
 	equal(ah_url.url, ah_should, "Autohide-Check");
@@ -273,23 +273,23 @@ module("Callbacks & Actions (Vimeo)");
 /*asyncTest("PlayerReady", function(){
 	var x = $("#qunit-fixture").xmbd();
 	
-	x.embed("vimeo", vids.vimeo);
 	x.on("playerReady", function(s){
 		console.log(s);
 		ok(true, "Called!");
 		start();
 	});
+	x.embed("vimeo", vids.vimeo);
 });
 
 asyncTest("PlayerStateChange", function(){
 	var x = $("#qunit-fixture").xmbd();
 	
-	x.embed("vimeo", vids.vimeo);
 	x.on("playerStateChange", function(s){
 		ok(true, "Called!");
 		x.unbind("playerStateChange");
 		start();
 	});
+	x.embed("vimeo", vids.vimeo);
 });
 
 asyncTest("vPlaying and action('play')", function(){

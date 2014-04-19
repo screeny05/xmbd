@@ -1,6 +1,6 @@
-/*! jQuery xmbd - v0.2.1 - 2013-12-21
+/*! jQuery xmbd - v0.2.2 - 2014-04-20
  * https://github.com/screeny05/xmbd
- * Copyright (c) 2013 Sebastian Langer
+ * Copyright (c) 2014 Sebastian Langer
  * MIT-Licensed */
 
 ;(function($){
@@ -111,7 +111,7 @@
 					// Yeah, I hear you saying:
 					// > string concatenation like this is not the fastest way, just use the +-operator!
 					// No, I won't. it's just more convenient imho. (more info: http://bit.ly/1cOocNZ)
-					return "//www.youtube.com/v/" + id + "?" + params;
+					return "https://www.youtube.com/v/" + id + "?" + params;
 				},
 				getInfo: function(id, fn){
 					$.getJSON("//gdata.youtube.com/feeds/api/videos/" + id + "?alt=json-in-script&callback=?", function(data){
