@@ -4,7 +4,7 @@
 // * add docs for getInfo()
 // * forceSecure
 
-/*! jQuery xmbd - v0.2.2 - 2014-04-20
+/*! jQuery xmbd - v0.3.0 - 2014-07-15
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2014 Sebastian Langer
  * MIT-Licensed */
