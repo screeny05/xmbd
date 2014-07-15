@@ -10,7 +10,7 @@ module.exports = function(grunt){
 		uglify: {
 			options: {
 				banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - built: <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-				sourceMap: 'xmbd.min.map'
+				sourceMap: 'build/xmbd.min.map'
 			},
 			build: {
 				src: 'src/<%= pkg.name %>.js',

@@ -4,7 +4,7 @@
 // * add docs for getInfo()
 // * forceSecure
 
-/*! jQuery xmbd - v0.3.0 - 2014-07-15
+/*! jQuery xmbd - v0.4.0 - 2014-04-20
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2014 Sebastian Langer
  * MIT-Licensed */
@@ -92,7 +92,7 @@
     /*
     * Media Provider Library
     * Providers need:
-    * - iframe:bool true = url is an iframe, not a swf
+    * - embedmethod:string - "iframe" || "swfobject" || function(embedobj){}
     * - getId(url:string) - turns a full url into the video-id
     * - getUrl(id:string, options:object) - turns a video-id with given options into a embeddable url
     * - getInfo(id:string, fn:function) - returns available info about an item {name, provider, id, duration, available}
@@ -100,8 +100,58 @@
     * - play, pause, stop, cue - should explain themselves
     */
     var providerYoutube = {
-      // we use YouTube's ActionScript-API
-      iframe: false,
+      // we use YouTube's HTML5-API now!
+      embedmethod: function(embedobj){
+
+        // we need to define this as a function, in case the YT-API is not yet initialized
+        var embedYt = function(){
+          var player;
+
+          // replace the content of the div with our new iframe
+          self.$element.html("<iframe src='" + embedobj.url + "' id='" + self.guid + "' width='100%' height='100%' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>");
+
+          // declare events
+          var onPlayerReady = function(){
+            self.player = player;
+            self.triggerStateChange(self.provider.youtube.state(9));
+          };
+
+          var onPlayerStateChange = function(s){
+            s = self.provider.youtube.state(s.data);
+            self.triggerStateChange(s);
+          };
+
+          var onPlayerError = function(e){
+            self.trigger("error", e);
+          };
+
+          // get the api and attach all the needed events
+          player = new window.YT.Player(self.guid, {
+            events: {
+              onReady: onPlayerReady,
+              onStateChange: onPlayerStateChange,
+              onError: onPlayerError
+            }
+          });
+        };
+
+        // check if the api is yet initialized
+        if(!window.YT && !window.onYouTubeIframeAPIReady){
+          // not available, load the yt-api!
+          self.provider.youtube.loadApi();
+          window.onYouTubeIframeAPIReady = embedYt;
+        } else {
+          // execute our embedding-method
+          embedYt();
+        }
+
+      },
+      loadApi: function(){
+        var s = document.createElement("script");
+        s.src = "https://www.youtube.com/player_api";
+        var before = document.getElementsByTagName("script")[0];
+        before.parentNode.insertBefore(s, before);
+      },
       getId: function(url){
         if(typeof url !== "string"){
           return false;
@@ -130,14 +180,13 @@
           "origin="   + encodeURIComponent(window.location.origin),
           "playerapiid="  + self.guid,
           "enablejsapi=1",
-          "version=3",
           "rel=0"
         ].join("&");
         
         // Yeah, I hear you saying:
         // > string concatenation like this is not the fastest way, just use the +-operator!
         // No, I won't. it's just more convenient imho. (more info: http://bit.ly/1cOocNZ)
-        return (forceSecure ? "https:" : "") + "//www.youtube.com/v/" + id + "?" + params;
+        return (forceSecure ? "https:" : "") + "//www.youtube.com/embed/" + id + "?" + params;
       },
       getInfo: function(id, fn){
         $.getJSON((forceSecure ? "https:" : "") + "//gdata.youtube.com/feeds/api/videos/" + id + "?alt=json-in-script&callback=?", function(data){
@@ -197,7 +246,7 @@
     };
 
     var providerVimeo = {
-      iframe: true,
+      embedmethod: "iframe",
       getId: function(url){
         var m = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/|video\/)?([0-9]+)/i);
         if(!m){
@@ -286,7 +335,7 @@
     };
 
     var providerDailymotion = {
-        iframe: false,
+        embedmethod: "swfobject",
         getId: function(url){
           // Dailymotion URLs may be a little weird.
           // if m[2] is not null we use this instead of m[1]
@@ -360,7 +409,7 @@
       }
       return {
         url: self.provider[prov].getUrl(id, options),
-        iframe: self.provider[prov].iframe
+        embedmethod: self.provider[prov].embedmethod
       };
     };
 
@@ -455,10 +504,14 @@
         self.triggerStateChange(availableStates["-1"]);
       }
       // embed the object according to it's iframe-attribute
-      if(!embedObj.iframe){
+      if(embedObj.embedmethod === "swfobject"){
         self.embedSWF(embedObj.url);
-      } else {
+      } else if(embedObj.embedmethod === "iframe"){
         self.embedIframe(embedObj.url);
+      } else if(typeof embedObj.embedmethod === "function"){
+        embedObj.embedmethod(embedObj);
+      } else {
+        throw new Error("Unknown embedding method: " + self.provider.embedmethod);
       }
     };
     
@@ -487,7 +540,7 @@
       self.trigger(s);
       self.trigger("playerStateChange", s);
     };
-    
+
     // Youtube-Compatible Media-Providers use this.
     // i.e: YouTube, DailyMotion
     window["onytcstatechange_" + self.guid] = function(s){
@@ -548,8 +601,10 @@ window.ytCompatibleReady = function(e){
 window.onVimeoMessage = function(m){
   /* jshint camelcase: false */
   "use strict";
-  var data = JSON.parse(m.data);
-  window["onvimeostatechange_" + data.player_id](data.event);
+  if(m.origin.indexOf("vimeo.com") !== -1){
+    var data = JSON.parse(m.data);
+    window["onvimeostatechange_" + data.player_id](data.event);
+  }
 };
 // see Vimeo API-Docs for more info about this.
 if(window.addEventListener){
