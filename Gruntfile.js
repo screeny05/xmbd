@@ -42,4 +42,5 @@ module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.registerTask('default', ['jshint', 'uglify', 'connect', 'qunit']);
+	grunt.registerTask('test', ['connect', 'qunit']);
 };

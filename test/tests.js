@@ -13,20 +13,28 @@ var opts = {
 module("General");
 asyncTest("Event-Lib", function(){
 	var x = $("#qunit-fixture").xmbd();
-	x.on("custom", function(val){
+	x.on("custom", function(val, bal){
 		ok(true, "Event triggering working");
 		equal(val, "value", "Params working");
 	});
 	x.embed("vimeo", vids.vimeo, {
 		on: {
-			custom2: function(){
+			custom2: function(val){
 				ok(true, "Event binding through embed-method");
+				equal(val, "value", "embed-method, Params working");
 				start();
 			}
 		}
 	});
 	x.trigger("custom", "value");
 	x.trigger("custom2", "value");
+});
+
+test("Same GUID when retrieving again", function(){
+	var orgGuid = $("#qunit-fixture").xmbd().guid;
+	var newGuid = $("#qunit-fixture").xmbd().guid;
+
+	equal(orgGuid, newGuid, "working");
 });
 
 module("GetMediaUrl");
@@ -74,10 +82,10 @@ test("Vimeo", function(){
 		color: "#FFF"
 	});
 	
-	var ap_should = "//player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=1&byline=1&portrait=1&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
-	var ah_should = "//player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=0&portrait=0&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
-	var loop_should = "//player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=00adef&loop=1&player_id=" + x.guid + "&api=1";
-	var color_should = "//player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=FFF&loop=0&player_id=" + x.guid + "&api=1";
+	var ap_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=1&byline=1&portrait=1&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
+	var ah_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=0&portrait=0&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
+	var loop_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=00adef&loop=1&player_id=" + x.guid + "&api=1";
+	var color_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=FFF&loop=0&player_id=" + x.guid + "&api=1";
 	
 	equal(ap_url.url, ap_should, "Autoplay-Check");
 	equal(ah_url.url, ah_should, "Autohide-Check");
@@ -102,8 +110,8 @@ test("Dailymotion", function(){
 		background: "#fff"
 	});
 	
-	var ap_should = "//www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=1&playerapiid=" + x.guid + "&enableApi=1";
-	var color_should = "//www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=0&highlight=fff&foreground=fff&background=fff&playerapiid=" + x.guid + "&enableApi=1";
+	var ap_should = "https://www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=1&playerapiid=" + x.guid + "&enableApi=1";
+	var color_should = "https://www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=0&highlight=fff&foreground=fff&background=fff&playerapiid=" + x.guid + "&enableApi=1";
 	
 	equal(ap_url.url, ap_should, "Autoplay");
 	equal(color_un_url.url, color_should, "Color");
@@ -266,7 +274,7 @@ test("Embedding", function(){
 	ok(x.html().indexOf("object") !== -1, "Embedding SWFObjects");*/
 	
 	x.embed("vimeo", vids.vimeo);
-	ok(x.html().indexOf("iframe") !== -1, "Embedding Iframes");
+	ok($("#qunit-fixture").html().indexOf("iframe") !== -1, "Embedding Iframes");
 });
 
 module("Callbacks & Actions (Vimeo)");

@@ -1,11 +1,11 @@
-# ![xmbd.](http://i.imgur.com/BWwq2iO.png "xmbd.") [![Build Status](https://travis-ci.org/screeny05/xmbd.png?branch=master)](https://travis-ci.org/screeny05/xmbd) [![Dependency Status](https://gemnasium.com/screeny05/xmbd.png)](https://gemnasium.com/screeny05/xmbd)
+# ![xmbd.](http://i.imgur.com/BWwq2iO.png "xmbd.") [![Build Status](https://travis-ci.org/screeny05/xmbd.png?branch=master)](https://travis-ci.org/screeny05/xmbd)
 
 
 xmbd is a jQuery-plugin which gives you the ability to embed media from several provider on your website.
 
 xmbd provides different events and methods for different provider under one simple interface! 
 
-It's as simple as `$('#someId').xmbd.embed('vimeo', '75320274');` to include a video on your page.
+It's as simple as `$('#someId').xmbd().embed('vimeo', '75320274');` to include a video on your page.
 
 **Note:** Be sure to include [swfobject](https://code.google.com/p/swfobject/) to enable embedding of flash-objects.
 
@@ -227,3 +227,8 @@ Param        | Vimeo | YouTube | DailyMotion
 1. Get the source-code
 2. Get the Grunt-CLI `npm install grunt-cli`
 3. Do some testing `npm test`
+
+## Changelog
+### 0.3.0
+* retrieve old xmbd-instances by doing $(element).xmbd(); (Doesn't reinitialize everything)
+* Major restructuring
