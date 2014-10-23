@@ -12,13 +12,13 @@ var opts = {
 var x;
 $(function(){
 	x = $("#player").xmbd();
-	
+
 	x.on("playerStateChange", function(e){
 		console.log(e);
 	});
 
-	x.embed("dailymotion", "x1571bg", opts);
-	
+	x.embed("vimeo", vids.vimeo, opts);
+
 	$(".cmd").click(function(e){
 		e.preventDefault();
 		x.action($(this).text().toLowerCase());
@@ -33,14 +33,3 @@ $(function(){
 		x.action("cue", 20);
 	});
 });
-
-
-
-
-
-
-
-
-
-
-

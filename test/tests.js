@@ -52,12 +52,12 @@ test("YouTube", function(){
 	var theme_url = x.getMediaUrl("youtube", vids["youtube"], {
 		theme: "light"
 	});
-	
-	var ap_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var ah_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var loop_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	var theme_should = "https://www.youtube.com/v/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&version=3&rel=0";
-	
+
+	var ap_should = "https://www.youtube.com/embed/" + vids["youtube"] + "?autoplay=1&autohide=2&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&rel=0";
+	var ah_should = "https://www.youtube.com/embed/" + vids["youtube"] + "?autoplay=0&autohide=1&loop=0&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&rel=0";
+	var loop_should = "https://www.youtube.com/embed/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=1&playlist=" + vids["youtube"] + "&theme=dark&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&rel=0";
+	var theme_should = "https://www.youtube.com/embed/" + vids["youtube"] + "?autoplay=0&autohide=2&loop=0&theme=light&origin=" + encodeURIComponent(window.location.origin) + "&playerapiid=" + x.guid + "&enablejsapi=1&rel=0";
+
 	equal(ap_url.url, ap_should, "Autoplay-Check");
 	equal(ah_url.url, ah_should, "Autohide-Check");
 	equal(loop_url.url, loop_should, "Loop-Check");
@@ -81,12 +81,12 @@ test("Vimeo", function(){
 	var color_pref_url = x.getMediaUrl("vimeo", vids["vimeo"], {
 		color: "#FFF"
 	});
-	
+
 	var ap_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=1&byline=1&portrait=1&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
 	var ah_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=0&portrait=0&color=00adef&loop=0&player_id=" + x.guid + "&api=1";
 	var loop_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=00adef&loop=1&player_id=" + x.guid + "&api=1";
 	var color_should = "https://player.vimeo.com/video/" + vids["vimeo"] + "?autoplay=0&byline=1&portrait=1&color=FFF&loop=0&player_id=" + x.guid + "&api=1";
-	
+
 	equal(ap_url.url, ap_should, "Autoplay-Check");
 	equal(ah_url.url, ah_should, "Autohide-Check");
 	equal(loop_url.url, loop_should, "Loop-Check");
@@ -109,10 +109,10 @@ test("Dailymotion", function(){
 		foreground: "#fff",
 		background: "#fff"
 	});
-	
+
 	var ap_should = "https://www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=1&playerapiid=" + x.guid + "&enableApi=1";
 	var color_should = "https://www.dailymotion.com/swf/" + vids["dailymotion"] + "?autoPlay=0&highlight=fff&foreground=fff&background=fff&playerapiid=" + x.guid + "&enableApi=1";
-	
+
 	equal(ap_url.url, ap_should, "Autoplay");
 	equal(color_un_url.url, color_should, "Color");
 	equal(color_pref_url.url, color_should, "Color, prefixed");
@@ -122,7 +122,7 @@ module("GetMediaId");
 test("YouTube", function(){
 	var x = $("#qunit-fixture").xmbd();
 	var id = vids["youtube"];
-	
+
 	var url_formats = [
 		{
 			descr: "Short Format",
@@ -157,23 +157,23 @@ test("YouTube", function(){
 			url: "http://gdata.youtube.com/feeds/api/videos/" + id
 		}
 	];
-	
+
 	var result, url;
 	for(var i = 0; i < url_formats.length; i++){
 		result = x.getMediaId(url_formats[i].url);
-		
+
 		ok(result, url_formats[i].descr + " - Returns Object");
 		if(result){
 			equal(result.provider, "youtube", url_formats[i].descr + " - Recognizes Provider");
 			equal(result.id, id, url_formats[i].descr + " - Recognizes ID");
 		}
 	}
-	
+
 	for(var i = 0; i < url_formats.length; i++){
 		url = url_formats[i].url;
 		url += (url.indexOf("?") === -1 ? "?" : "&") + "feature=youtu.be&autoplay=1";
 		result = x.getMediaId(url);
-		
+
 		ok(result, url_formats[i].descr + " [paramed] - Returns Object");
 		if(result){
 			equal(result.provider, "youtube", url_formats[i].descr + " [paramed] - Recognizes Provider");
@@ -211,11 +211,11 @@ test("Vimeo", function(){
 			url: "http://player.vimeo.com/video/" + id
 		}
 	];
-	
+
 	var result;
 	for(var i = 0; i < url_formats.length; i++){
 		result = x.getMediaId(url_formats[i].url);
-		
+
 		ok(result, url_formats[i].descr + " - Recognizes URL");
 		if(result){
 			equal(result.provider, "vimeo", url_formats[i].descr + " - Recognizes Provider");
@@ -253,11 +253,11 @@ test("Dailymotion", function(){
 			url: "http://www.dailymotion.com/swf/" + id
 		}
 	];
-	
+
 	var result;
 	for(var i = 0; i < url_formats.length; i++){
 		result = x.getMediaId(url_formats[i].url);
-		
+
 		ok(result, url_formats[i].descr + " - Recognizes URL");
 		if(result){
 			equal(result.provider, "dailymotion", url_formats[i].descr + " - Recognizes Provider");
@@ -269,18 +269,19 @@ test("Dailymotion", function(){
 module("General");
 test("Embedding", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
+
 	/*x.embed("youtube", vids.youtube);
 	ok(x.html().indexOf("object") !== -1, "Embedding SWFObjects");*/
-	
+
 	x.embed("vimeo", vids.vimeo);
 	ok($("#qunit-fixture").html().indexOf("iframe") !== -1, "Embedding Iframes");
 });
 
-module("Callbacks & Actions (Vimeo)");
-/*asyncTest("PlayerReady", function(){
+/*module("Callbacks & Actions (Vimeo)");
+
+asyncTest("PlayerReady", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
+
 	x.on("playerReady", function(s){
 		console.log(s);
 		ok(true, "Called!");
@@ -291,7 +292,7 @@ module("Callbacks & Actions (Vimeo)");
 
 asyncTest("PlayerStateChange", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
+
 	x.on("playerStateChange", function(s){
 		ok(true, "Called!");
 		x.unbind("playerStateChange");
@@ -302,8 +303,8 @@ asyncTest("PlayerStateChange", function(){
 
 asyncTest("vPlaying and action('play')", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
-	
+
+
 	x.embed({
 		provider: "vimeo",
 		id: vids.vimeo,
@@ -321,8 +322,8 @@ asyncTest("vPlaying and action('play')", function(){
 
 asyncTest("vPaused and action('pause')", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
-	
+
+
 	x.embed({
 		provider: "vimeo",
 		id: vids.vimeo,
@@ -341,8 +342,8 @@ asyncTest("vPaused and action('pause')", function(){
 
 asyncTest("action('stop')", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
-	
+
+
 	x.embed({
 		provider: "vimeo",
 		id: vids.vimeo,
@@ -363,7 +364,7 @@ asyncTest("action('stop')", function(){
 
 asyncTest("action('toggle')", function(){
 	var x = $("#qunit-fixture").xmbd();
-	
+
 	x.embed({
 		provider: "vimeo",
 		id: vids.vimeo,
@@ -380,21 +381,3 @@ asyncTest("action('toggle')", function(){
 		}
 	});
 });*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

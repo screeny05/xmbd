@@ -1,10 +1,4 @@
-// Changelog v0.3.0:
-// * unbind-docs
-// * retrieve old xmbd-instances
-// * add docs for getInfo()
-// * forceSecure
-
-/*! jQuery xmbd - v0.3.0 - 2014-07-15
+/*! jQuery xmbd - v0.5.0 - 2014-10-22
  * https://github.com/screeny05/xmbd
  * Copyright (c) 2014 Sebastian Langer
  * MIT-Licensed */
@@ -20,7 +14,7 @@
     self.element = element;
     self.$element = $(element);
 
-    var forceSecure = true;
+    var forceSecure = false;
 
     // Always be sure to update these variables!
     self.current = {
@@ -92,7 +86,7 @@
     /*
     * Media Provider Library
     * Providers need:
-    * - iframe:bool true = url is an iframe, not a swf
+    * - embedmethod:string - "iframe" || "swfobject" || function(embedobj){}
     * - getId(url:string) - turns a full url into the video-id
     * - getUrl(id:string, options:object) - turns a video-id with given options into a embeddable url
     * - getInfo(id:string, fn:function) - returns available info about an item {name, provider, id, duration, available}
@@ -100,8 +94,58 @@
     * - play, pause, stop, cue - should explain themselves
     */
     var providerYoutube = {
-      // we use YouTube's ActionScript-API
-      iframe: false,
+      // we use YouTube's HTML5-API now!
+      embedmethod: function(embedobj){
+
+        // we need to define this as a function, in case the YT-API is not yet initialized
+        var embedYt = function(){
+          var player;
+
+          // replace the content of the div with our new iframe
+          self.$element.html("<iframe src='" + embedobj.url + "' id='" + self.guid + "' width='100%' height='100%' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>");
+
+          // declare events
+          var onPlayerReady = function(){
+            self.player = player;
+            self.triggerStateChange(self.provider.youtube.state(9));
+          };
+
+          var onPlayerStateChange = function(s){
+            s = self.provider.youtube.state(s.data);
+            self.triggerStateChange(s);
+          };
+
+          var onPlayerError = function(e){
+            self.trigger("error", e);
+          };
+
+          // get the api and attach all the needed events
+          player = new window.YT.Player(self.guid, {
+            events: {
+              onReady: onPlayerReady,
+              onStateChange: onPlayerStateChange,
+              onError: onPlayerError
+            }
+          });
+        };
+
+        // check if the api is yet initialized
+        if(!window.YT && !window.onYouTubeIframeAPIReady){
+          // not available, load the yt-api!
+          self.provider.youtube.loadApi();
+          window.onYouTubeIframeAPIReady = embedYt;
+        } else {
+          // execute our embedding-method
+          embedYt();
+        }
+
+      },
+      loadApi: function(){
+        var s = document.createElement("script");
+        s.src = "https://www.youtube.com/player_api";
+        var before = document.getElementsByTagName("script")[0];
+        before.parentNode.insertBefore(s, before);
+      },
       getId: function(url){
         if(typeof url !== "string"){
           return false;
@@ -119,7 +163,7 @@
         // JSHint-Compatible!
         // For a detailed explanation of parameters,
         // see: https://developers.google.com/youtube/player_parameters
-        
+
         // be sure to have a options-object!
         options = options || {};
         var params = [
@@ -130,14 +174,13 @@
           "origin="   + encodeURIComponent(window.location.origin),
           "playerapiid="  + self.guid,
           "enablejsapi=1",
-          "version=3",
           "rel=0"
         ].join("&");
-        
+
         // Yeah, I hear you saying:
         // > string concatenation like this is not the fastest way, just use the +-operator!
         // No, I won't. it's just more convenient imho. (more info: http://bit.ly/1cOocNZ)
-        return (forceSecure ? "https:" : "") + "//www.youtube.com/v/" + id + "?" + params;
+        return (forceSecure ? "https:" : "") + "//www.youtube.com/embed/" + id + "?" + params;
       },
       getInfo: function(id, fn){
         $.getJSON((forceSecure ? "https:" : "") + "//gdata.youtube.com/feeds/api/videos/" + id + "?alt=json-in-script&callback=?", function(data){
@@ -197,7 +240,7 @@
     };
 
     var providerVimeo = {
-      iframe: true,
+      embedmethod: "iframe",
       getId: function(url){
         var m = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/|video\/)?([0-9]+)/i);
         if(!m){
@@ -261,14 +304,14 @@
         // because it uses an Iframe and EventListeners
         // so we have to "post" messages to the iframe
         // see: http://developer.vimeo.com/player/js-api#universal-with-postmessage
-        
+
         value = value || true;
         var p = $("#" + self.guid);
-        
+
         // NEVER forget to include the protocol!
         // That's because we use protocol-relative urls.
         // see: http://www.paulirish.com/2010/the-protocol-relative-url/
-        var url = window.location.protocol + p.attr("src").split("?")[0];
+        var url = (forceSecure ? "" : window.location.protocol) + p.attr("src").split("?")[0];
         p[0].contentWindow.postMessage(JSON.stringify({ method: method, value: value }), url);
       },
       play: function(){
@@ -286,7 +329,7 @@
     };
 
     var providerDailymotion = {
-        iframe: false,
+        embedmethod: "iframe",
         getId: function(url){
           // Dailymotion URLs may be a little weird.
           // if m[2] is not null we use this instead of m[1]
@@ -312,10 +355,11 @@
             "highlight="   + (options.highlight  || "").replace("#", ""),
             "foreground="  + (options.foreground || "").replace("#", ""),
             "background="  + (options.background || "").replace("#", ""),
-            "playerapiid=" + self.guid,
-            "enableApi=1"
-          ].join("&").replace("&highlight=&foreground=&background=", "");
-          return (forceSecure ? "https:" : "") + "//www.dailymotion.com/swf/" + id + params;
+            "id=" + self.guid,
+            "logo=0",
+            "api=postMessage"
+          ].join("&").replace("&highlight=&foreground=&background=&", "&");
+          return (forceSecure ? "https:" : "") + "//www.dailymotion.com/embed/video/" + id + params;
         },
         getInfo: function(id, fn){
           $.getJSON("https://api.dailymotion.com/video/" + id + "?fields=title,duration,embed_url&callback=?", function(data) {
@@ -332,17 +376,40 @@
             });
           });
         },
+        state: function(s){
+          var st = availableStates;
+          switch(s){
+            case "ended":     return st[0];
+            case "playing":   return st[1];
+            case "pause":     return st[2];
+            case "progress":  return st[3];
+            case "seeked":    return st[5];
+            case "apiready":  return st[9];
+            default:          return s;
+          }
+        },
+        post: function(method, value){
+          // dailymotion a api smilar to vimeo by using EventListeners and postMessage
+          // see: https://github.com/dailymotion/dailymotion-sdk-js/blob/master/src/core/player.js#L43
+
+          value = value || true;
+          var p = $("#" + self.guid);
+
+          // again, don't forget to include the protocol!
+          var url = (forceSecure ? "" : window.location.protocol) + p.attr("src").split("?")[0];
+          p[0].contentWindow.postMessage(method + (!value ? "" : "=" + value), url);
+        },
         play: function(){
-          self.player.playVideo();
+          self.provider.dailymotion.post("play");
         },
         pause: function(){
-          self.player.pauseVideo();
+          self.provider.dailymotion.post("pause");
         },
         stop: function(){
-          self.player.stopVideo();
+          self.provider.dailymotion.post("pause");
         },
         cue: function(time){
-          self.player.seekTo(time);
+          self.provider.dailymotion.post("seek", time);
         }
     };
 
@@ -360,7 +427,7 @@
       }
       return {
         url: self.provider[prov].getUrl(id, options),
-        iframe: self.provider[prov].iframe
+        embedmethod: self.provider[prov].embedmethod
       };
     };
 
@@ -380,7 +447,7 @@
           }
         }
       }
-      
+
       return false;
     };
 
@@ -391,7 +458,7 @@
       }
       return self.provider[prov].getInfo(id, fn);
     };
-    
+
     // Abstracted Function (see self.getMediaUrl)
     // if the provider offers a method such as `play`
     // execute it. else check if the user wants to
@@ -426,9 +493,9 @@
         id = options.id;
         prov = options.provider;
       }
-      
+
       options = options || {};
-      
+
       // Add all the event-handlers in the on-object.
       if(options.hasOwnProperty("on")){
         for(var key in options.on){
@@ -437,14 +504,14 @@
           }
         }
       }
-      
+
       // retrieve embed url and iframe-bool from our abstracted method.
       var embedObj = self.getMediaUrl(prov, id, options);
-      
+
       // be sure to update these!
       self.current.provider = prov;
       self.current.id = id;
-      
+
       // if there already is an embedded object, delete it
       // so we don't have two instances.
       if($("#" + self.guid).length > 0){
@@ -455,17 +522,21 @@
         self.triggerStateChange(availableStates["-1"]);
       }
       // embed the object according to it's iframe-attribute
-      if(!embedObj.iframe){
+      if(embedObj.embedmethod === "swfobject"){
         self.embedSWF(embedObj.url);
-      } else {
+      } else if(embedObj.embedmethod === "iframe"){
         self.embedIframe(embedObj.url);
+      } else if(typeof embedObj.embedmethod === "function"){
+        embedObj.embedmethod(embedObj);
+      } else {
+        throw new Error("Unknown embedding method: " + self.provider.embedmethod);
       }
     };
-    
+
     self.embedIframe = function(url){
       self.$element.html("<iframe src='" + url + "' id='" + self.guid + "' width='100%' height='100%' frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>");
     };
-    
+
     self.embedSWF = function(url){
       self.$element.html("<div id='" + self.guid + "'></div>");
       swfobject.embedSWF(url, self.guid, "100%", "100%", "8", null, null, {
@@ -480,45 +551,46 @@
         }
       });
     };
-    
+
     // Updates the State and throws necessary Events.
     self.triggerStateChange = function(s){
       self.current.state = s;
       self.trigger(s);
       self.trigger("playerStateChange", s);
     };
-    
-    // Youtube-Compatible Media-Providers use this.
-    // i.e: YouTube, DailyMotion
-    window["onytcstatechange_" + self.guid] = function(s){
-      // parse the state into a string.
-      s = self.provider.youtube.state(s);
-      // if this is the inital throw of this event
-      // change the self.player property, so we can
-      // execute player-specific methods like play & pause.
-      if(s === "playerReady"){
-        self.player = document.getElementById(self.guid);
-      }
 
-      self.triggerStateChange(s);
-    };
     // Vimeo stateChange-Handler
     window["onvimeostatechange_" + self.guid] = function(s){
       s = self.provider.vimeo.state(s);
       self.triggerStateChange(s);
-      
+
       // if this is the inital throw of this event
       // add eventListeners for all necessary events.
-      // TODO: are Errors also appended?
       if(s === "playerReady"){
         // set self.player to a truthy value
         // to enable the vUnstarted-event on detachment
         self.player = "vimeo";
+        // add eventhandlers, as vimeo doesn't do thius by itself.
         $(["pause", "finish", "play"]).each(function(i, e){
           self.provider.vimeo.post("addEventListener", e);
         });
       }
     };
+
+    window["ondailymotionstatechange_" + self.guid] = function(s){
+      if(s.event === "error"){
+        return self.trigger("error", s);
+      }
+      s = self.provider.dailymotion.state(s.event);
+      self.triggerStateChange(s);
+
+      if(s === "playerReady"){
+        // set self.player to a truthy value
+        // to enable the vUnstarted-event on detachment
+        self.player = "dailymotion";
+      }
+    };
+
   };
 
   $.fn.xmbd = function(){
@@ -533,29 +605,46 @@
 
 }(jQuery));
 
-
-
-// Youtube-Compatible-Provider
-window.ytCompatibleReady = function(e){
-  "use strict";
-  var player = document.getElementById(e);
-  player.addEventListener("onStateChange", "onytcstatechange_" + e);
-  player.addEventListener("onError", "onytcstatechange_" + e);
-  window["onytcstatechange_" + e](9);
-};
-
 //Vimeo specific
 window.onVimeoMessage = function(m){
   /* jshint camelcase: false */
   "use strict";
-  var data = JSON.parse(m.data);
-  window["onvimeostatechange_" + data.player_id](data.event);
+  if(m.origin.indexOf("vimeo.com") !== -1){
+    var data = JSON.parse(m.data);
+    window["onvimeostatechange_" + data.player_id](data.event);
+  }
 };
-// see Vimeo API-Docs for more info about this.
+window.onPostMessage = function(m){
+  /* jshint camelcase: false */
+  "use strict";
+  var data;
+  if(m.origin.indexOf("vimeo.com") !== -1){
+    data = JSON.parse(m.data);
+    window["onvimeostatechange_" + data.player_id](data.event);
+  } else if(m.origin.indexOf("dailymotion.com") !== -1){
+    data = {};
+    var key, value;
+    var parts = m.data.split("&");
+    $(parts).each(function(i, part){
+      part = part.split("=", 2);
+      if(!part[0]){
+        return;
+      }
+      key = decodeURIComponent(part[0]);
+      value = part[1] ? decodeURIComponent(part[1].replace(/\+/g, "%20")) : "";
+      data[key] = value;
+    });
+    if(!data.id || !data.event){
+      return;
+    }
+    window["ondailymotionstatechange_" + data.id](data);
+  }
+};
+// see Vimeo API-Docs / Dailymotion API for more info about this.
 if(window.addEventListener){
-  window.addEventListener("message", window.onVimeoMessage, false);
+  window.addEventListener("message", window.onPostMessage, false);
 } else {
-  window.attachEvent("onmessage", window.onVimeoMessage, false);
+  window.attachEvent("onmessage", window.onPostMessage, false);
 }
 
 //Dailymotion specific

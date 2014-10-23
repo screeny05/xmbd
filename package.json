@@ -1,6 +1,6 @@
 {
   "name": "xmbd",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "title": "jQuery xmbd",
   "description": "Cross-provider media embedding with jQuery. Embeds YouTube, Vimeo and much more under a simple interface.",
   "keywords": [
